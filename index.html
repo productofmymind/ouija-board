@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ouija Board — Let the Spirits Decide</title>
+<meta name="description" content="Ask a question, list 2–4 possible answers, and let the spirits choose.">
+<style>
+  :root {
+    --bg: #0d0907;
+    --wood: #3b2412;
+    --wood-hi: #5a3a1e;
+    --ink: #e9d8b0;
+    --glow: #ffcf6b;
+    --muted: #a58f68;
+    --panel: #1a120c;
+    --danger: #ff7a59;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(ellipse at 50% 0%, #2a1a10 0%, var(--bg) 70%) fixed;
+    color: var(--ink);
+    font-family: Georgia, "Times New Roman", serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 24px 16px 48px;
+  }
+  h1 {
+    font-weight: normal;
+    letter-spacing: .35em;
+    text-transform: uppercase;
+    font-size: clamp(1.3rem, 4vw, 2rem);
+    margin: 8px 0 4px;
+    text-align: center;
+    text-shadow: 0 0 18px rgba(255, 207, 107, .35);
+  }
+  .sub { color: var(--muted); margin: 0 0 20px; text-align: center; font-style: italic; }
+  main { width: 100%; max-width: 860px; }
+
+  form {
+    background: var(--panel);
+    border: 1px solid var(--wood-hi);
+    border-radius: 10px;
+    padding: 18px;
+    display: grid;
+    gap: 12px;
+  }
+  label { font-size: .85rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+  input[type=text] {
+    width: 100%;
+    background: #0d0907;
+    border: 1px solid var(--wood-hi);
+    border-radius: 6px;
+    color: var(--ink);
+    font: inherit;
+    font-size: 1rem;
+    padding: 10px 12px;
+    margin-top: 4px;
+  }
+  input[type=text]:focus { outline: 2px solid var(--glow); outline-offset: 1px; }
+  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media (max-width: 560px) { .answers { grid-template-columns: 1fr; } }
+  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  button {
+    font: inherit;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+    background: linear-gradient(var(--wood-hi), var(--wood));
+    color: var(--ink);
+    border: 1px solid var(--glow);
+    border-radius: 6px;
+    padding: 10px 22px;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) { box-shadow: 0 0 14px rgba(255, 207, 107, .5); }
+  button:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
+  button:disabled { opacity: .5; cursor: wait; }
+  button.ghost { background: none; border-color: var(--wood-hi); color: var(--muted); }
+  .err { color: var(--danger); min-height: 1.2em; margin: 0; font-size: .9rem; }
+
+  .board-wrap {
+    margin-top: 20px;
+    border-radius: 14px;
+    padding: 10px;
+    background: linear-gradient(145deg, var(--wood-hi), var(--wood));
+    box-shadow: 0 10px 40px rgba(0,0,0,.7), inset 0 0 0 2px #00000055;
+  }
+  svg { display: block; width: 100%; height: auto; }
+  .board-bg { fill: #c9a56a; }
+  .board-edge { fill: none; stroke: #3b2412; stroke-width: 3; }
+  .ch { fill: #2b1a0c; font-family: Georgia, serif; font-size: 30px; text-anchor: middle; dominant-baseline: central; transition: fill .2s; }
+  .ch.sm { font-size: 24px; }
+  .ch.big { font-size: 38px; letter-spacing: .1em; }
+  .ch.hot { fill: #9b1b0c; }
+  .deco { fill: none; stroke: #2b1a0c; stroke-width: 2; }
+  #planchette { transition: transform 1s cubic-bezier(.45,.05,.25,1); }
+  #planchette .body { fill: #3b2412; stroke: #1a0f07; stroke-width: 2; filter: drop-shadow(4px 8px 5px rgba(0,0,0,.5)); }
+  #planchette .win { fill: rgba(255, 244, 205, .25); stroke: var(--glow); stroke-width: 3; }
+  .reduced #planchette { transition-duration: .2s; }
+
+  .results {
+    margin-top: 20px;
+    display: grid;
+    gap: 10px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--wood-hi);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    transition: all .5s;
+  }
+  .card .n { color: var(--muted); font-size: .85rem; letter-spacing: .1em; }
+  .card.win {
+    border-color: var(--glow);
+    box-shadow: 0 0 22px rgba(255, 207, 107, .55);
+    background: #2a1a0c;
+    transform: scale(1.02);
+  }
+  .card.lose { opacity: .4; }
+  .verdict { text-align: center; font-size: 1.2rem; min-height: 1.6em; margin: 14px 0 0; color: var(--glow); }
+  footer { margin-top: 28px; color: var(--muted); font-size: .8rem; text-align: center; }
+</style>
+</head>
+<body>
+<h1>Ouija</h1>
+<p class="sub">Ask a question. Offer 2–4 answers. The spirits will choose.</p>
+
+<main>
+  <form id="f" autocomplete="off">
+    <div>
+      <label for="q">Your question</label>
+      <input id="q" type="text" maxlength="120" placeholder="What should I have for dinner?">
+    </div>
+    <div class="answers">
+      <div><label for="a0">Answer 1</label><input id="a0" type="text" maxlength="40" placeholder="Pizza"></div>
+      <div><label for="a1">Answer 2</label><input id="a1" type="text" maxlength="40" placeholder="Tacos"></div>
+      <div><label for="a2">Answer 3 (optional)</label><input id="a2" type="text" maxlength="40" placeholder="Sushi"></div>
+      <div><label for="a3">Answer 4 (optional)</label><input id="a3" type="text" maxlength="40" placeholder="Curry"></div>
+    </div>
+    <p class="err" id="err" role="alert"></p>
+    <div class="row">
+      <button id="go" type="submit">Summon the spirits</button>
+      <button id="reset" class="ghost" type="button">Clear</button>
+    </div>
+  </form>
+
+  <div class="board-wrap">
+    <svg id="board" viewBox="0 0 800 500" role="img" aria-label="Ouija board with a planchette">
+      <rect class="board-bg" x="0" y="0" width="800" height="500" rx="18"/>
+      <rect class="board-edge" x="10" y="10" width="780" height="480" rx="12"/>
+      <rect class="board-edge" x="20" y="20" width="760" height="460" rx="8" style="stroke-width:1"/>
+      <!-- sun / moon -->
+      <g class="deco">
+        <circle cx="400" cy="68" r="22"/>
+        <path d="M400 34v10M400 92v10M366 68h10M424 68h10M376 44l7 7M417 85l7 7M424 44l-7 7M383 85l-7 7"/>
+      </g>
+      <g id="letters"></g>
+      <g id="planchette" style="transform:translate(400px,300px)">
+        <path class="body" d="M0 -62 C 40 -20 66 30 38 60 C 14 80 -14 80 -38 60 C -66 30 -40 -20 0 -62Z"/>
+        <circle class="win" cx="0" cy="0" r="22"/>
+      </g>
+    </svg>
+  </div>
+
+  <p class="verdict" id="verdict" aria-live="polite"></p>
+  <div class="results" id="results"></div>
+</main>
+
+<footer>For entertainment only. The spirits are, in fact, <code>crypto.getRandomValues</code>.</footer>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const $ = id => document.getElementById(id);
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduced) document.body.classList.add('reduced');
+
+  // ---- board layout: char -> {x,y} ----
+  const pos = {};
+  const lettersG = $('letters');
+  function put(ch, x, y, cls = '') {
+    const t = document.createElementNS(NS, 'text');
+    t.setAttribute('x', x); t.setAttribute('y', y);
+    t.setAttribute('class', 'ch ' + cls);
+    t.textContent = ch;
+    lettersG.appendChild(t);
+    if (ch.length === 1) pos[ch] = { x, y, el: t };
+    return t;
+  }
+  function arc(chars, R, spread) {
+    const cx = 400, cy = 535;
+    chars.forEach((c, i) => {
+      const a = (-spread + (2 * spread * i) / (chars.length - 1)) * Math.PI / 180;
+      put(c, +(cx + R * Math.sin(a)).toFixed(1), +(cy - R * Math.cos(a)).toFixed(1));
+    });
+  }
+  arc([...'ABCDEFGHIJKLM'], 380, 40);
+  arc([...'NOPQRSTUVWXYZ'], 305, 36);
+  [...'1234567890'].forEach((c, i) => put(c, 230 + i * 38, 355, 'sm'));
+  put('YES', 130, 100, 'big'); put('NO', 670, 100, 'big');
+  const bye = put('GOODBYE', 400, 440, 'sm');
+  const mid = { x: 400, y: 285 };
+
+  const pl = $('planchette');
+  const move = (p, ms) => new Promise(r => {
+    pl.style.transform = `translate(${p.x}px,${p.y}px)`;
+    setTimeout(r, reduced ? 250 : ms);
+  });
+  const rnd = n => crypto.getRandomValues(new Uint32Array(1))[0] % n;
+
+  const form = $('f'), err = $('err'), go = $('go');
+  const inputs = [0, 1, 2, 3].map(i => $('a' + i));
+
+  $('reset').onclick = () => {
+    form.reset(); err.textContent = '';
+    $('results').innerHTML = ''; $('verdict').textContent = '';
+    pl.style.transform = `translate(${mid.x}px,${mid.y}px)`;
+    $('q').focus();
+  };
+
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const q = $('q').value.trim();
+    const opts = inputs.map(i => i.value.trim()).filter(Boolean);
+    if (!q) return void (err.textContent = 'Ask a question first.');
+    if (opts.length < 2) return void (err.textContent = 'Give the spirits at least two answers.');
+    err.textContent = '';
+    go.disabled = true;
+    lettersG.querySelectorAll('.hot').forEach(n => n.classList.remove('hot'));
+
+    // render cards
+    const win = rnd(opts.length);
+    const res = $('results'), verdict = $('verdict');
+    res.innerHTML = ''; verdict.textContent = '';
+    const cards = opts.map((o, i) => {
+      const d = document.createElement('div');
+      d.className = 'card';
+      const n = document.createElement('span'); n.className = 'n'; n.textContent = i + 1;
+      const s = document.createElement('span'); s.textContent = o;
+      d.append(n, s); res.appendChild(d);
+      return d;
+    });
+
+    // the dance
+    await move(mid, 700);
+    await move({ x: 400, y: 160 }, 800);
+    const word = [...opts[win].toUpperCase()].filter(c => pos[c]).slice(0, 14);
+    for (const ch of word) {
+      await move(pos[ch], 1000);
+      pos[ch].el.classList.add('hot');
+      await new Promise(r => setTimeout(r, reduced ? 100 : 550));
+    }
+    await move(bye, 1000);
+    bye.classList.add('hot');
+
+    cards.forEach((c, i) => c.classList.add(i === win ? 'win' : 'lose'));
+    verdict.textContent = `The spirits say: ${opts[win]}`;
+    cards[win].scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+    setTimeout(() => bye.classList.remove('hot'), 2500);
+    go.disabled = false;
+  });
+})();
+</script>
+</body>
+</html>
