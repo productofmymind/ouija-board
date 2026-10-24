@@ -10,153 +10,106 @@
 <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0d0907;
-    --wood-hi: #5a3a1e;
-    --wood: #3b2412;
-    --ink: #e9d8b0;
-    --glow: #ffcf6b;
-    --muted: #a58f68;
-    --panel: #1a120c;
-    --danger: #ff7a59;
+    --table: #2a1c12;
+    --ink: #17100a;
+    --red: #b3200e;
+    --paper: #f0e4c4;
+    --paper-ink: #2b1a0c;
     --display: 'Rye', Georgia, 'Times New Roman', serif;
+    --type: 'Courier New', Courier, monospace;
   }
   * { box-sizing: border-box; }
   body {
     margin: 0;
     min-height: 100vh;
-    background: radial-gradient(ellipse at 50% 0%, #2a1a10 0%, var(--bg) 70%) fixed;
-    color: var(--ink);
-    font-family: Georgia, "Times New Roman", serif;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 24px 16px 48px;
+    background: var(--table);
+    color: var(--paper-ink);
+    font-family: var(--type);
+    padding: 24px 16px 40px;
   }
-  h1 {
-    font-family: var(--display);
-    font-weight: normal;
-    letter-spacing: .2em;
-    text-transform: uppercase;
-    font-size: clamp(1.6rem, 5vw, 2.6rem);
-    margin: 8px 0 4px;
-    text-align: center;
-    text-shadow: 0 0 18px rgba(255, 207, 107, .35);
-  }
-  .sub { color: var(--muted); margin: 0 0 20px; text-align: center; font-style: italic; }
-  main { width: 100%; max-width: 980px; }
-
-  form {
-    background: var(--panel);
-    border: 1px solid var(--wood-hi);
-    border-radius: 10px;
-    padding: 18px;
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  .layout {
+    max-width: 1180px;
+    margin: 0 auto;
     display: grid;
-    gap: 12px;
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 24px;
+    align-items: start;
   }
-  label { font-size: .85rem; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-  input[type=text] {
-    width: 100%;
-    background: #0d0907;
-    border: 1px solid var(--wood-hi);
-    border-radius: 6px;
-    color: var(--ink);
-    font: inherit;
-    font-size: 1rem;
-    padding: 10px 12px;
-    margin-top: 4px;
-  }
-  input[type=text]:focus { outline: 2px solid var(--glow); outline-offset: 1px; }
-  .answers { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  @media (max-width: 560px) { .answers { grid-template-columns: 1fr; } }
-  .row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
-  button {
-    font: inherit;
-    letter-spacing: .15em;
-    text-transform: uppercase;
-    background: linear-gradient(var(--wood-hi), var(--wood));
-    color: var(--ink);
-    border: 1px solid var(--glow);
-    border-radius: 6px;
-    padding: 10px 22px;
-    cursor: pointer;
-  }
-  button:hover:not(:disabled) { box-shadow: 0 0 14px rgba(255, 207, 107, .5); }
-  button:focus-visible { outline: 2px solid var(--glow); outline-offset: 2px; }
-  button:disabled { opacity: .5; cursor: wait; }
-  button.ghost { background: none; border-color: var(--wood-hi); color: var(--muted); }
-  .err { color: var(--danger); min-height: 1.2em; margin: 0; font-size: .9rem; }
+  @media (max-width: 920px) { .layout { grid-template-columns: 1fr; max-width: 640px; } }
 
-  .board-wrap {
-    margin-top: 20px;
-    border-radius: 14px;
-    padding: 8px;
-    background: linear-gradient(145deg, var(--wood-hi), var(--wood));
-    box-shadow: 0 10px 40px rgba(0,0,0,.7);
-  }
-  svg { display: block; width: 100%; height: auto; }
+  .board-wrap { box-shadow: 0 6px 24px rgba(0,0,0,.55); border-radius: 6px; }
+  svg { display: block; width: 100%; height: auto; border-radius: 6px; }
   .ch {
-    fill: #17100a;
+    fill: var(--ink);
     font-family: var(--display);
     text-anchor: middle;
     dominant-baseline: central;
     transition: fill .25s;
   }
-  .ch.hot { fill: #b3200e; }
+  .ch.hot { fill: var(--red); }
   #planchette { transition: transform 1s cubic-bezier(.45,.05,.25,1); }
-  #planchette .body { fill: rgba(38, 20, 8, .6); fill-rule: evenodd; stroke: #1a0f07; stroke-width: 4; filter: drop-shadow(8px 14px 8px rgba(0,0,0,.45)); }
-  #planchette .ring { fill: none; stroke: #ffcf6b; stroke-width: 5; }
+  #planchette .body { fill: rgba(50, 28, 12, .62); fill-rule: evenodd; stroke: #1a0f07; stroke-width: 3; filter: drop-shadow(6px 10px 6px rgba(0,0,0,.35)); }
+  #planchette .ring { fill: none; stroke: #1a0f07; stroke-width: 6; }
+  #planchette .shine { fill: none; stroke: rgba(255,255,255,.55); stroke-width: 2; }
   .reduced #planchette { transition-duration: .2s; }
 
-  .results { margin-top: 20px; display: grid; gap: 10px; }
-  .card {
-    background: var(--panel);
-    border: 1px solid var(--wood-hi);
-    border-radius: 8px;
-    padding: 12px 16px;
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    transition: all .5s;
+  .note {
+    background: var(--paper);
+    padding: 22px 20px 24px;
+    box-shadow: 0 4px 14px rgba(0,0,0,.45);
+    font-size: 15px;
   }
-  .card .n { color: var(--muted); font-size: .85rem; letter-spacing: .1em; }
-  .card.win {
-    border-color: var(--glow);
-    box-shadow: 0 0 22px rgba(255, 207, 107, .55);
-    background: #2a1a0c;
-    transform: scale(1.02);
+  .note h2 { font: bold 15px var(--type); letter-spacing: .12em; text-transform: uppercase; margin: 0 0 16px; }
+  label { display: block; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; margin-top: 14px; }
+  input[type=text] {
+    width: 100%;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px dashed var(--paper-ink);
+    color: var(--paper-ink);
+    font: inherit;
+    font-size: 16px;
+    padding: 6px 0 4px;
+    border-radius: 0;
   }
-  .card.lose { opacity: .4; }
-  .verdict { text-align: center; font-size: 1.2rem; min-height: 1.6em; margin: 14px 0 0; color: var(--glow); }
-  footer { margin-top: 28px; color: var(--muted); font-size: .8rem; text-align: center; }
+  input[type=text]::placeholder { color: #8a7a5c; }
+  input[type=text]:focus { outline: none; border-bottom: 2px solid var(--red); }
+  .err { color: var(--red); min-height: 1.2em; margin: 12px 0 0; font-size: 13px; }
+  .row { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; }
+  button {
+    font: inherit;
+    font-size: 13px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    background: var(--paper-ink);
+    color: var(--paper);
+    border: 2px solid var(--paper-ink);
+    border-radius: 0;
+    padding: 9px 14px;
+    cursor: pointer;
+  }
+  button:hover:not(:disabled) { background: #46290f; }
+  button:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
+  button:disabled { opacity: .5; cursor: wait; }
+  button.ghost { background: transparent; color: var(--paper-ink); }
+  button.ghost:hover { background: rgba(43,26,12,.1); }
+
+  .verdict { margin: 20px 0 0; font-weight: bold; font-size: 16px; color: var(--red); min-height: 1.4em; }
+  ol { margin: 8px 0 0; padding-left: 22px; }
+  li { padding: 3px 0; transition: opacity .4s; }
+  li.win { font-weight: bold; color: var(--red); }
+  li.lose { opacity: .45; text-decoration: line-through; }
+  .fine { margin: 18px 0 0; font-size: 11px; color: #7a6a4c; }
 </style>
 </head>
 <body>
-<h1>Ouija</h1>
-<p class="sub">Ask a question. Offer 2–4 answers. The spirits will choose.</p>
-
-<main>
-  <form id="f" autocomplete="off">
-    <div>
-      <label for="q">Your question</label>
-      <input id="q" type="text" maxlength="120" placeholder="What should I have for dinner?">
-    </div>
-    <div class="answers">
-      <div><label for="a0">Answer 1</label><input id="a0" type="text" maxlength="40" placeholder="Pizza"></div>
-      <div><label for="a1">Answer 2</label><input id="a1" type="text" maxlength="40" placeholder="Tacos"></div>
-      <div><label for="a2">Answer 3 (optional)</label><input id="a2" type="text" maxlength="40" placeholder="Sushi"></div>
-      <div><label for="a3">Answer 4 (optional)</label><input id="a3" type="text" maxlength="40" placeholder="Curry"></div>
-    </div>
-    <p class="err" id="err" role="alert"></p>
-    <div class="row">
-      <button id="go" type="submit">Summon the spirits</button>
-      <button id="reset" class="ghost" type="button">Clear</button>
-    </div>
-  </form>
-
+<h1 class="sr">Ouija board</h1>
+<div class="layout">
   <div class="board-wrap">
     <svg id="board" viewBox="0 0 1200 900" role="img" aria-label="Ouija board with a planchette">
       <defs>
-        <clipPath id="clip"><rect width="1200" height="900" rx="14"/></clipPath>
+        <clipPath id="clip"><rect width="1200" height="900" rx="6"/></clipPath>
         <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
           <stop offset="0" stop-color="#f1d79a"/><stop offset=".5" stop-color="#ebc984"/><stop offset="1" stop-color="#e0b972"/>
         </linearGradient>
@@ -164,20 +117,6 @@
           <feTurbulence type="fractalNoise" baseFrequency="0.006 0.07" numOctaves="3" seed="7"/>
           <feColorMatrix values="0 0 0 0 .5  0 0 0 0 .32  0 0 0 0 .1  0 0 0 1.1 -.35"/>
         </filter>
-        <!-- dark cloud for the corners -->
-        <g id="cloud" fill="#17100a">
-          <circle cx="0" cy="0" r="105"/><circle cx="95" cy="-30" r="55"/><circle cx="-30" cy="95" r="55"/>
-          <circle cx="80" cy="55" r="48"/><circle cx="50" cy="-80" r="40"/><circle cx="-80" cy="50" r="40"/>
-        </g>
-        <!-- bottom-left figure with hands reaching out -->
-        <g id="figure">
-          <use href="#cloud" x="40" y="-40"/>
-          <ellipse cx="85" cy="-105" rx="38" ry="46" fill="#ebc984" stroke="#17100a" stroke-width="3"/>
-          <path d="M45 -118 Q60 -170 110 -150 Q135 -135 128 -105 Q112 -140 85 -130 Q65 -125 45 -118Z" fill="#17100a"/>
-          <path d="M20 -10 Q30 -60 85 -62 Q140 -60 150 -10Z" fill="#ebc984" stroke="#17100a" stroke-width="3"/>
-          <path d="M60 -25 Q110 -40 190 -28 L188 -10 Q120 -15 60 -8Z" fill="#ebc984" stroke="#17100a" stroke-width="3"/>
-          <path d="M165 -34 l22 -6 M168 -26 l24 -2 M168 -18 l22 4" stroke="#17100a" stroke-width="3" stroke-linecap="round"/>
-        </g>
       </defs>
 
       <g clip-path="url(#clip)">
@@ -185,46 +124,67 @@
         <rect width="1200" height="900" filter="url(#grain)" opacity=".55"/>
 
         <!-- sun, top-left -->
-        <use href="#cloud" x="25" y="75"/>
-        <g id="sunrays" fill="#ebc984"></g>
-        <circle cx="45" cy="95" r="62" fill="#ebc984" stroke="#17100a" stroke-width="4"/>
+        <g id="sunrays" fill="#17100a"></g>
+        <circle cx="55" cy="95" r="58" fill="#ebc984" stroke="#17100a" stroke-width="4"/>
         <g fill="none" stroke="#17100a" stroke-width="4" stroke-linecap="round">
-          <path d="M30 80 q10 -8 20 0 M70 76 q8 -8 18 0"/>
-          <path d="M55 82 q-8 18 2 24 M25 118 q25 25 60 0"/>
+          <path d="M38 80 q10 -8 20 0 M78 80 q10 -8 20 0"/>
+          <path d="M66 84 q-8 16 2 22 M36 118 q27 22 56 0"/>
         </g>
-        <circle cx="42" cy="86" r="5" fill="#17100a"/><circle cx="79" cy="84" r="5" fill="#17100a"/>
+        <circle cx="48" cy="86" r="5" fill="#17100a"/><circle cx="88" cy="86" r="5" fill="#17100a"/>
 
-        <!-- moon, top-right -->
-        <use href="#cloud" x="1175" y="85"/>
-        <path d="M1160 35 A70 70 0 0 0 1160 185 A35 70 0 0 1 1160 35Z" fill="#ebc984" stroke="#17100a" stroke-width="4"/>
-        <path d="M1085 95 l8 20 l22 2 l-17 14 l6 22 l-19 -12 l-19 12 l6 -22 l-17 -14 l22 -2Z" fill="#ebc984" stroke="#17100a" stroke-width="3" transform="translate(80 -50) scale(.9)"/>
+        <!-- moon and star, top-right -->
+        <path d="M1160 30 A75 75 0 0 0 1160 190 A38 75 0 0 1 1160 30Z" fill="#17100a"/>
+        <path d="M1060 52 l7 17 l19 1 l-15 12 l5 19 l-16 -10 l-16 10 l5 -19 l-15 -12 l19 -1Z" fill="#17100a"/>
 
-        <!-- figures, bottom corners -->
-        <use href="#figure" transform="translate(0 900)"/>
-        <use href="#figure" transform="translate(1200 900) scale(-1 1)"/>
+        <!-- corner flourishes -->
+        <g fill="none" stroke="#17100a" stroke-width="3">
+          <path id="fl" d="M0 800 A100 100 0 0 1 100 900 M0 830 A70 70 0 0 1 70 900 M0 860 A40 40 0 0 1 40 900"/>
+          <use href="#fl" transform="translate(1200 0) scale(-1 1)"/>
+        </g>
 
         <!-- title -->
-        <path id="t1" d="M360 175 Q600 60 840 175" fill="none"/>
+        <path id="t1" d="M360 160 Q600 50 840 160" fill="none"/>
         <text class="ch" font-size="116" letter-spacing="2"><textPath href="#t1" startOffset="50%">OUIJA</textPath></text>
-        <path id="t2" d="M400 215 Q610 195 800 245" fill="none"/>
-        <text class="ch" font-size="24" letter-spacing="2"><textPath href="#t2" startOffset="50%">MYSTIFYING ORACLE</textPath></text>
+        <path id="t2" d="M440 198 Q610 182 780 222" fill="none"/>
+        <text class="ch" font-size="22" letter-spacing="2"><textPath href="#t2" startOffset="50%">MYSTIFYING ORACLE</textPath></text>
 
         <g id="letters"></g>
 
         <g id="planchette" style="transform:translate(600px,600px)">
           <path class="body" d="M0 -150 C75 -95 138 -15 112 72 C92 130 32 150 0 150 C-32 150 -92 130 -112 72 C-138 -15 -75 -95 0 -150Z M-60 0 a60 60 0 1 0 120 0 a60 60 0 1 0 -120 0Z"/>
           <circle class="ring" cx="0" cy="0" r="60"/>
+          <circle class="shine" cx="0" cy="0" r="56"/>
         </g>
       </g>
-      <rect x="6" y="6" width="1188" height="888" rx="12" fill="none" stroke="#17100a" stroke-width="5"/>
+      <rect x="6" y="6" width="1188" height="888" rx="4" fill="none" stroke="#17100a" stroke-width="5"/>
+      <rect x="16" y="16" width="1168" height="868" rx="2" fill="none" stroke="#17100a" stroke-width="1.5"/>
     </svg>
   </div>
 
-  <p class="verdict" id="verdict" aria-live="polite"></p>
-  <div class="results" id="results"></div>
-</main>
-
-<footer>For entertainment only. The spirits are, in fact, <code>crypto.getRandomValues</code>.</footer>
+  <aside class="note">
+    <form id="f" autocomplete="off">
+      <h2>Ask the board</h2>
+      <label for="q">Question</label>
+      <input id="q" type="text" maxlength="120" placeholder="What should I have for dinner?">
+      <label for="a0">Answer 1</label>
+      <input id="a0" type="text" maxlength="40" placeholder="Pizza">
+      <label for="a1">Answer 2</label>
+      <input id="a1" type="text" maxlength="40" placeholder="Tacos">
+      <label for="a2">Answer 3 (optional)</label>
+      <input id="a2" type="text" maxlength="40" placeholder="Sushi">
+      <label for="a3">Answer 4 (optional)</label>
+      <input id="a3" type="text" maxlength="40" placeholder="Curry">
+      <p class="err" id="err" role="alert"></p>
+      <div class="row">
+        <button id="go" type="submit">Ask</button>
+        <button id="reset" class="ghost" type="button">Clear</button>
+      </div>
+    </form>
+    <p class="verdict" id="verdict" aria-live="polite"></p>
+    <ol id="results"></ol>
+    <p class="fine">For entertainment only.</p>
+  </aside>
+</div>
 
 <script>
 (() => {
@@ -237,9 +197,9 @@
   const rays = $('sunrays');
   for (let i = 0; i < 18; i++) {
     const a = i * Math.PI / 9, d = .13;
-    const p = (r, t) => `${45 + r * Math.cos(t)},${95 + r * Math.sin(t)}`;
+    const p = (r, t) => `${55 + r * Math.cos(t)},${95 + r * Math.sin(t)}`;
     const tri = document.createElementNS(NS, 'polygon');
-    tri.setAttribute('points', `${p(60, a - d)} ${p(100, a)} ${p(60, a + d)}`);
+    tri.setAttribute('points', `${p(56, a - d)} ${p(108, a)} ${p(56, a + d)}`);
     rays.appendChild(tri);
   }
 
@@ -304,13 +264,11 @@
     const win = rnd(opts.length);
     const res = $('results'), verdict = $('verdict');
     res.innerHTML = ''; verdict.textContent = '';
-    const cards = opts.map((o, i) => {
-      const d = document.createElement('div');
-      d.className = 'card';
-      const n = document.createElement('span'); n.className = 'n'; n.textContent = i + 1;
-      const s = document.createElement('span'); s.textContent = o;
-      d.append(n, s); res.appendChild(d);
-      return d;
+    const items = opts.map(o => {
+      const li = document.createElement('li');
+      li.textContent = o;
+      res.appendChild(li);
+      return li;
     });
 
     await move(home, 700);
@@ -324,9 +282,9 @@
     await move({ x: 600, y: 805 }, 1100);
     bye.classList.add('hot');
 
-    cards.forEach((c, i) => c.classList.add(i === win ? 'win' : 'lose'));
+    items.forEach((li, i) => li.classList.add(i === win ? 'win' : 'lose'));
     verdict.textContent = `The spirits say: ${opts[win]}`;
-    cards[win].scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
+    verdict.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'nearest' });
     setTimeout(() => bye.classList.remove('hot'), 2500);
     go.disabled = false;
   });
