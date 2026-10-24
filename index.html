@@ -257,7 +257,7 @@
       pos[ch].el.classList.add('hot');
       await new Promise(r => setTimeout(r, reduced ? 100 : 550));
     }
-    await move(bye, 1000);
+    await move({ x: 400, y: 440 }, 1000);
     bye.classList.add('hot');
 
     cards.forEach((c, i) => c.classList.add(i === win ? 'win' : 'lose'));
